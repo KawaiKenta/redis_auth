@@ -9,12 +9,11 @@ import (
 )
 
 var (
-	redis *reds.Client
+	Redis *reds.Client
 )
 
 func Setup() {
-
-	redis = reds.NewClient(&reds.Options{
+	Redis = reds.NewClient(&reds.Options{
 		Addr:     config.Redis.Address,
 		Password: config.Redis.Password,
 		DB:       config.Redis.DataBaseType,
@@ -25,7 +24,7 @@ func Setup() {
 }
 
 func Close() {
-	if err := redis.Close(); err != nil {
+	if err := Redis.Close(); err != nil {
 		log.Fatalf("close when redis client: %v", err)
 	}
 }
