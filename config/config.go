@@ -20,13 +20,14 @@ type server struct {
 }
 
 type redis struct {
-	Address      string
-	Password     string
-	DataBaseType int
+	Address        string
+	Password       string
+	DataBaseType   int
+	ExpirationTime time.Duration
 }
 
 func Setup() {
-	config, err := ini.Load("config.ini")
+	config, err := ini.Load("./config/config.ini")
 	if err != nil {
 		log.Fatalf("setting error: %v", err)
 	}

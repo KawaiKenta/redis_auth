@@ -1,30 +1,29 @@
 package redis
 
 import (
-	"fmt"
 	"log"
+	"time"
 
-	reds "github.com/go-redis/redis/v9"
+	"github.com/go-redis/redis/v9"
 	"kk-rschian.com/redis_auth/config"
 )
 
 var (
-	Redis *reds.Client
+	Client  *redis.Client
+	expTime time.Duration
 )
 
 func Setup() {
-	Redis = reds.NewClient(&reds.Options{
+	Client = redis.NewClient(&redis.Options{
 		Addr:     config.Redis.Address,
 		Password: config.Redis.Password,
 		DB:       config.Redis.DataBaseType,
 	})
-	fmt.Println(config.Redis.Address)
-	fmt.Println(config.Redis.Password)
-	fmt.Println(config.Redis.DataBaseType)
+	expTime = config.Redis.ExpirationTime
 }
 
 func Close() {
-	if err := Redis.Close(); err != nil {
+	if err := Client.Close(); err != nil {
 		log.Fatalf("close when redis client: %v", err)
 	}
 }
