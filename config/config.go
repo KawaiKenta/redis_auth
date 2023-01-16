@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	Server = &server{}
-	Redis  = &redis{}
+	Server   = &server{}
+	Redis    = &redis{}
+	Database = &database{}
 )
 
 type server struct {
@@ -17,6 +18,16 @@ type server struct {
 	HttpPort     int
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
+}
+
+type database struct {
+	Type     string
+	Host     string
+	Port     int
+	Name     string
+	User     string
+	Password string
+	Charset  string
 }
 
 type redis struct {
@@ -33,8 +44,9 @@ func Setup() {
 	}
 
 	settings := map[string]interface{}{
-		"server": Server,
-		"redis":  Redis,
+		"server":   Server,
+		"redis":    Redis,
+		"database": Database,
 	}
 	for key, settingStruct := range settings {
 		if err := config.Section(key).MapTo(settingStruct); err != nil {

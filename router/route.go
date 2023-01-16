@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"kk-rschian.com/redis_auth/redis"
+	"kk-rschian.com/redis_auth/service/redis"
 )
 
 func InitRoute() *gin.Engine {

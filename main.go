@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"kk-rschian.com/redis_auth/config"
-	"kk-rschian.com/redis_auth/redis"
 	"kk-rschian.com/redis_auth/router"
+	"kk-rschian.com/redis_auth/service/redis"
 )
 
 func init() {
