@@ -8,12 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"kk-rschian.com/redis_auth/config"
 	"kk-rschian.com/redis_auth/router"
+	"kk-rschian.com/redis_auth/service/database"
 	"kk-rschian.com/redis_auth/service/redis"
 )
 
 func init() {
 	config.Setup()
 	redis.Setup()
+	database.Setup()
 }
 
 func main() {

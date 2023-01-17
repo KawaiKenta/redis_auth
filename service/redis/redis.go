@@ -9,8 +9,10 @@ import (
 )
 
 var (
-	Client  *redis.Client
-	expTime time.Duration
+	Client   *redis.Client
+	expTime  time.Duration
+	secure   bool
+	httpOnly bool
 )
 
 func Setup() {
@@ -20,6 +22,9 @@ func Setup() {
 		DB:       config.Redis.DataBaseType,
 	})
 	expTime = config.Redis.ExpirationTime
+	// TODO: need change
+	secure = false
+	httpOnly = false
 }
 
 func Close() {

@@ -9,7 +9,7 @@ func SetSession(c *gin.Context, key string, value string) error {
 	if err := Client.Set(c, key, value, expTime).Err(); err != nil {
 		return err
 	}
-	c.SetCookie(key, value, 0, "/", "localhost", false, false)
+	c.SetCookie(key, value, 0, "/", "localhost", secure, httpOnly)
 	return nil
 }
 
@@ -21,7 +21,7 @@ func DeleteSession(c *gin.Context, key string) error {
 	if err := Client.Del(c, key).Err(); err != nil {
 		return err
 	}
-	c.SetCookie(key, "", -1, "/", "localhost", false, false)
+	c.SetCookie(key, "", -1, "/", "localhost", secure, httpOnly)
 	return nil
 }
 
