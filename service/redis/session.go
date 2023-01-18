@@ -25,7 +25,6 @@ func DeleteSession(c *gin.Context, key string) error {
 	return nil
 }
 
-// このサーバーから呼び出されることは通常ない
 func GetSession(c *gin.Context, key string) (string, error) {
 	_, err := c.Cookie(key)
 	if err != nil {

@@ -10,12 +10,16 @@ import (
 	"kk-rschian.com/redis_auth/router"
 	"kk-rschian.com/redis_auth/service/database"
 	"kk-rschian.com/redis_auth/service/redis"
+	"kk-rschian.com/redis_auth/utils"
 )
 
 func init() {
 	config.Setup()
 	redis.Setup()
 	database.Setup()
+	for i := 0; i < 100; i++ {
+		println(utils.CreateToken())
+	}
 }
 
 func main() {

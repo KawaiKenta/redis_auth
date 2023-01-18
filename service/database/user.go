@@ -6,12 +6,15 @@ import (
 	"gorm.io/gorm"
 )
 
+/*
+IsVerified: Emailが認証されているか
+VerifyToken: Email認証, Password再設定時のアクセストークン
+*/
 type User struct {
 	gorm.Model
-	Name       string `gorm:"size:255" json:"name,omitempty"`
-	Email      string `gorm:"size:255;not null;unique" json:"email,omitempty"`
-	Password   string `gorm:"size:255;not null" json:"password,omitempty"`
-	IsVerified bool   `gorm:"not null" json:"is_verified"`
+	Name     string `gorm:"size:255" json:"name,omitempty"`
+	Email    string `gorm:"size:255;not null;unique" json:"email,omitempty"`
+	Password string `gorm:"size:255;not null" json:"password,omitempty"`
 }
 
 func GetUserByEmail(email string) (*User, error) {
