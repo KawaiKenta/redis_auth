@@ -49,7 +49,6 @@ func SignUp(c *gin.Context) {
 func VerifyUser(c *gin.Context) {
 	// get access token from url
 	token := c.Query("uuid")
-	println(token)
 
 	// check existance from redis
 	userJson, err := redis.GetSession(c, token)
@@ -83,4 +82,11 @@ func RequestPassword(c *gin.Context) {
 // emailからなのでページを返してあげる
 func ResetPassword(c *gin.Context) {
 
+}
+
+func TestView(c *gin.Context) {
+	// get access token from url
+	token := c.Query("uuid")
+	println(token)
+	c.HTML(http.StatusOK, "verify.html", gin.H{"token": token})
 }

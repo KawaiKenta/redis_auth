@@ -7,10 +7,15 @@ import (
 
 func InitRoute() *gin.Engine {
 	router := gin.Default()
+	// static files
+	router.Static("/assets", "views/assets")
+	router.LoadHTMLGlob("views/*html")
+
+	// routing
 	router.GET("/set", controller.SetSession)
 	// router.GET("/get", controller.GetSession)
 	router.GET("/del", controller.DeleteSession)
-
+	router.GET("/verify", controller.TestView)
 	// signup: set userdata to db. set random id for verify.
 	//         then, send email.
 	// verify: verify email. use db

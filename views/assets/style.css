@@ -1,0 +1,69 @@
+@charset "UTF-8";
+
+/* 変数 */
+:root {
+  --primary: #ff953a;
+  --darkgray: #222;
+  --midgray: #414141;
+  --gray: #888;
+  --white: #fff;
+
+  --side: 6vw;
+}
+
+:root {
+  font-size: 100px;
+}
+
+body {
+  color: var(--darkgray);
+  font-size: 0.16rem;
+  font-family: sans-serif;
+  line-height: 1.8;
+}
+
+/* reset, normalize, sanitize */
+body,
+h1,
+h2,
+h2,
+h4,
+h5,
+h6,
+p,
+ul,
+figure {
+  margin: 0;
+  padding: 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  vertical-align: bottom;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  opacity: 0.8;
+}
+/* ここまで */
+
+.container {
+  padding: 0.68rem var(--side);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  padding: 0.1rem;
+  max-width: 800px;
+}
