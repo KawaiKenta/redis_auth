@@ -87,6 +87,5 @@ func ResetPassword(c *gin.Context) {
 func TestView(c *gin.Context) {
 	// get access token from url
 	token := c.Query("uuid")
-	println(token)
 	c.HTML(http.StatusOK, "verify.html", gin.H{"token": token})
 }
