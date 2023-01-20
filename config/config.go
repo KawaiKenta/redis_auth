@@ -38,7 +38,7 @@ type redis struct {
 }
 
 func Setup() {
-	config, err := ini.Load("./config/config.ini")
+	config, err := ini.Load("config.ini")
 	if err != nil {
 		log.Fatalf("setting error: %v", err)
 	}

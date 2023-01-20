@@ -71,7 +71,3 @@ func userSeeds() error {
 	}
 	return nil
 }
-
-// table up
-// table down
-// seed
