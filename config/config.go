@@ -11,6 +11,7 @@ var (
 	Server   = &server{}
 	Redis    = &redis{}
 	Database = &database{}
+	Mail     = &mail{}
 )
 
 type server struct {
@@ -37,6 +38,15 @@ type redis struct {
 	ExpirationTime time.Duration
 }
 
+type mail struct {
+	Host              string
+	Port              int
+	User              string
+	Password          string
+	ConnectionTimeout time.Duration
+	SendTimeout       time.Duration
+}
+
 func Setup() {
 	config, err := ini.Load("config.ini")
 	if err != nil {
@@ -47,6 +57,7 @@ func Setup() {
 		"server":   Server,
 		"redis":    Redis,
 		"database": Database,
+		"mail":     Mail,
 	}
 	for key, settingStruct := range settings {
 		if err := config.Section(key).MapTo(settingStruct); err != nil {

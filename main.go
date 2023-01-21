@@ -9,15 +9,16 @@ import (
 	"kk-rschian.com/redis_auth/config"
 	"kk-rschian.com/redis_auth/router"
 	"kk-rschian.com/redis_auth/service/database"
+	"kk-rschian.com/redis_auth/service/mail"
 	"kk-rschian.com/redis_auth/service/redis"
-	"kk-rschian.com/redis_auth/utils"
 )
 
 func init() {
 	config.Setup()
 	redis.Setup()
 	database.Setup()
-	utils.TestMail()
+	mail.SetUp()
+	mail.SendEmailVerifyMail("Amagaki29870@gmail.com", "drwienne34")
 }
 
 func main() {
