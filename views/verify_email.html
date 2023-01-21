@@ -1,92 +1,248 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="js" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"
+    xmlns:o="urn:schemas-microsoft-com:office:office">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <!-- utf-8 works for most cases -->
+    <meta name="viewport" content="width=device-width" />
+    <!-- Forcing initial-scale shouldn't be necessary -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Use the latest (edge) version of IE rendering engine -->
+    <meta name="x-apple-disable-message-reformatting" />
+    <!-- Disable auto-scale in iOS 10 Mail entirely -->
+    <title>Infura.io</title>
+
+    <!-- CSS Reset : BEGIN -->
     <style>
-        @charset "UTF-8";
-
-        /* 変数 */
-        :root {
-            --primary: #ff953a;
-            --darkgray: #222;
-            --midgray: #414141;
-            --gray: #888;
-            --white: #fff;
-
-            --side: 6vw;
-        }
-
-        :root {
-            font-size: 100px;
-        }
-
+        html,
         body {
-            color: var(--darkgray);
-            font-size: 0.16rem;
-            font-family: sans-serif;
-            line-height: 1.8;
+            margin: 0 auto !important;
+            padding: 0 !important;
+            height: 100% !important;
+            width: 100% !important;
         }
 
-        /* reset, normalize, sanitize */
-        body,
-        h1,
-        h2,
-        h2,
-        h4,
-        h5,
-        h6,
-        p,
-        ul,
-        figure {
-            margin: 0;
-            padding: 0;
+        /* What it does: Stops email clients resizing small text. */
+        * {
+            -ms-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
         }
 
+        /* What it does: Centers email on Android 4.4 */
+        div[style*='margin: 16px 0'] {
+            margin: 0 !important;
+        }
+
+        table {
+            border-spacing: 0 !important;
+            border-collapse: collapse !important;
+            table-layout: fixed !important;
+            margin: 0 auto !important;
+        }
+
+        table table table {
+            table-layout: auto;
+        }
+
+        /* What it does: Uses a better rendering method when resizing images =
+in IE. */
         img {
-            max-width: 100%;
-            height: auto;
-            vertical-align: bottom;
+            -ms-interpolation-mode: bicubic;
+        }
+
+
+        *[x-apple-data-detectors],
+        /* iOS */
+        .x-gmail-data-detectors,
+        /* Gmail */
+        .x-gmail-data-detectors *,
+        .aBn {
+            border-bottom: 0 !important;
+            cursor: default !important;
+            color: inherit !important;
+            text-decoration: none !important;
+            font-size: inherit !important;
+            font-family: inherit !important;
+            font-weight: inherit !important;
+            line-height: inherit !important;
+        }
+
+        .a6S {
+            display: none !important;
+            opacity: 0.01 !important;
+        }
+
+        img.g-img+div {
+            display: none !important;
+        }
+
+
+        .email-container {
+            min-width: 375px !important;
+        }
+
+
+        @media screen and (max-width: 480px) {
+
+            /* What it does: Forces Gmail app to display email full width */
+            div>u~div .gmail {
+                min-width: 100vw;
+            }
+        }
+    </style>
+    <!-- CSS Reset : END -->
+
+    <style>
+        /* What it does: Hover styles for buttons */
+        .button-td,
+        .button-a {
+            transition: all 100ms ease-in;
+        }
+
+        .button-td:hover,
+        .button-a:hover {
+            background: #45c2f8 !important;
+            border-color: #45c2f8 !important;
         }
 
         a {
-            color: inherit;
-            text-decoration: none;
+            color: #28bcfb;
         }
 
-        a:hover {
-            opacity: 0.8;
+        #email-header {
+            background-color: #28bcfb;
+            background-image: url('cid:background.jpg');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            border-top: 0;
+            border-bottom: 0;
         }
 
-        /* ここまで */
-        .container {
-            padding: 0.68rem var(--side);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        /* Media Queries */
+        @media screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+                margin: auto !important;
+            }
 
-        .card {
-            width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            padding: 0.1rem;
-            max-width: 800px;
+            /* What it does: Forces elements to resize to the full width of the=
+ir container. Useful for resizing images beyond their max-width. */
+            .fluid {
+                max-width: 100% !important;
+                height: auto !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+
+            /* What it does: Forces table cells into full-width rows. */
+            .stack-column,
+            .stack-column-center {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                direction: ltr !important;
+            }
+
+            /* And center justify these ones. */
+            .stack-column-center {
+                text-align: center !important;
+            }
+
+            .center-on-narrow {
+                text-align: center !important;
+                display: block !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+                float: none !important;
+            }
+
+            table.center-on-narrow {
+                display: inline-block !important;
+            }
+
+            .email-container p {
+                font-size: 17px !important;
+            }
         }
     </style>
-    <title>メール認証</title>
+
 </head>
 
-<body>
-    <div class="container">
-        <section class="card">
-            <h1 class="title">メールアドレス認証完了</h1>
-            <p class="content">
-                {{.Token}}
-            </p>
-        </section>
+<body width="100%" background-color="#ffffff" style="margin: 0">
+    <div style="width: 100%; background: #ffffff; text-align: left">
+        <!-- Email Header : 画像 -->
+        <!-- <table role="presentation" cellspacing="0" cellpadding="0" text-align="center" width="100%"
+            style="margin: auto">
+            <tr>
+                <td style="padding: 48px 0; text-align: center" text-align="center=" id=" email-header">
+                    <img src="cid:logo.png" width="172.5" text-align="middle" alt="" style="max-width: 345px" />
+                </td>
+            </tr>
+        </table> -->
+        <!-- Email Header : END -->
+        <!-- Email Body : BEGIN -->
+        <table role="presentation" cellspacing="0" cellpadding="0" text-align="center" width="600"
+            style="margin: auto; padding: 48px 0" class="email-container">
+            <!-- 1 Column Text + Button : BEGIN -->
+            <tr>
+                <td background-color="#ffffff" style="padding: 40px 40px 20px; text-align: center">
+                    <h1 style=" margin: 0;
+                        font-size: 36px; line-height: 150%; color: #28bcfb; font-weight: normal; ">
+                        はじめまして
+                    </h1>
+                </td>
+            </tr>
+            <tr>
+                <td background-color=" #ffffff"
+                    style=" padding: 0 40px 40px; font-size: 16px; line-height: 140%; color: #666666; text-align: left; ">
+                    <p style="margin-bottom: 24px">
+                        サービスへのご登録ありがとうございます。<br>
+                        サービスの利用を開始するために、メールアドレスの認証を行う必要があります。<br>
+                        下のボタンをタップして認証を行ってください。<br>
+                    </p>
+                    <p style="margin: 0">
+                        有効期限は本メール送信後24時間です。<br>
+                        有効期限が切れてしまった場合は、お手数ですがもう一度ユーザー登録からやり直してください。
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td background-color="#ffffff" style=" padding: 0 40px 20px; font-family: 'Lato' , 'Helvetica Neue' ,
+                    Helvetica, Arial, sans=-serif; font-size: 14px; line-height: 140%; color: #666666; ">
+                    <!-- Button : BEGIN -->
+                    <table role=" presentation" cellspacing="0" cellpadding="0" text-align="center"
+                        style="margin: auto">
+                        <tr>
+                            <td style="border-radius: 2px; background: #28bcfb; text-align: center" class="button-td">
+                                <!-- TODO:hrefを変更 -->
+                                <a data-testid="verify" href="https://infura.io/verify/{{.Token}}" style=" background: #28bcfb; border: 15px solid #28bcfb; font-family: sans-serif; font-size:
+                        14px; line-height: 125%; text-align: center; text-decoration: none; text-transform: uppercase;
+                        display: block; border-radius: 2px; " class=" button-a">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #ffffff">
+                                        メールアドレスを認証する</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                    <!-- Button : END -->
+                </td>
+            </tr>
+            <!-- 1 Column Text + Button : END -->
+        </table>
+        <!-- Email Body : END -->
+
+        <!-- Email Footer : BEGIN -->
+        <table role="presentation" cellspacing="0" cellpadding="0" text-align="center" width="100%">
+            <tr>
+                <td style=" padding: 36px 10px; width: 100%; font-size: 12px; line-height: 140%; text-align: center; color: #ffffff; "
+                    class=" x-gmail-data-detectors">
+                    Copyright &copy; 2023 Kawai Kenta
+                </td>
+            </tr>
+        </table>
+        <!-- Email Footer : END -->
     </div>
 </body>
 

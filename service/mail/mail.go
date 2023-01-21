@@ -2,7 +2,6 @@ package mail
 
 import (
 	"bytes"
-	"crypto/tls"
 	"html/template"
 	"log"
 
@@ -30,7 +29,7 @@ func SetUp() {
 	// Set TLSConfig to provide custom TLS configuration. For example,
 	// to skip TLS verification (useful for testing):
 	// TODO: これを無効化する必要があるかも
-	server.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+
 	smtpClient, err = server.Connect()
 
 	if err != nil {
