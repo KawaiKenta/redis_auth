@@ -5,17 +5,23 @@ import (
 	"kk-rschian.com/redis_auth/controller"
 )
 
+// FIXME: ルートを外部の値にしておかないと、mail serviceがルートの値を使えない
+// 循環参照
 func InitRoute() *gin.Engine {
 	router := gin.Default()
 	// static files
 	router.Static("/assets", "views/assets")
 	router.LoadHTMLGlob("views/*html")
 
-	// routing
+	// 2回目だとエラーが帰る, redisのセッションが切れる？
+	router.POST("/user/signup", controller.SignUp)
+	router.GET("/user/verify", controller.VerifyUser)
+
 	router.GET("/set", controller.SetSession)
-	// router.GET("/get", controller.GetSession)
+	router.GET("/get", controller.GetSession)
 	router.GET("/del", controller.DeleteSession)
-	router.GET("/verify", controller.TestView)
+
+	router.GET("/test", controller.TestMail)
 	// signup: set userdata to db. set random id for verify.
 	//         then, send email.
 	// verify: verify email. use db

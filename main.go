@@ -18,7 +18,6 @@ func init() {
 	redis.Setup()
 	database.Setup()
 	mail.SetUp()
-	mail.SendEmailVerifyMail("Amagaki29870@gmail.com", "drwienne34")
 }
 
 func main() {

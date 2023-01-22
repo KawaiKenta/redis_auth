@@ -2,9 +2,11 @@ package mail
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"log"
 
+	"github.com/gin-gonic/gin"
 	mail "github.com/xhit/go-simple-mail/v2"
 	"kk-rschian.com/redis_auth/config"
 )
@@ -19,33 +21,38 @@ func SetUp() {
 	// SMTP Server
 	server.Host = config.Mail.Host
 	server.Port = config.Mail.Port
-	server.Username = config.Mail.User
+	server.Username = config.Mail.UserAddress
 	server.Password = config.Mail.Password
 	server.Encryption = mail.EncryptionSTARTTLS
 	server.KeepAlive = false
 	server.ConnectTimeout = config.Mail.ConnectionTimeout
 	server.SendTimeout = config.Mail.SendTimeout
 
-	// Set TLSConfig to provide custom TLS configuration. For example,
-	// to skip TLS verification (useful for testing):
-	// TODO: これを無効化する必要があるかも
-
 	smtpClient, err = server.Connect()
-
 	if err != nil {
 		log.Fatalf("smtp client error: %v", err)
 	}
 }
 
-func SendEmailVerifyMail(to string, token string) error {
+func SendEmailVerifyMail(c *gin.Context, to string, token string) error {
 	templateFileName := "views/verify_email.html"
-	data := struct{ Token string }{Token: token}
+	// TODO: ハードコーディング
+	url := fmt.Sprintf("%s%s?uuid=%s", c.Request.Host, "/user/verify", token)
+	data := struct {
+		Token string
+		Url   string
+	}{Token: token, Url: url}
+
 	subject := "メールアドレスを認証してください"
 	if err := sendHtmlEmail(templateFileName, data, to, subject); err != nil {
 		return err
 	}
 	return nil
 }
+
+// func SendResetPasswordMail(to string, token string) error {
+
+// }
 
 func sendHtmlEmail(templateFileName string, data any, to string, subject string) error {
 	// get html from template
@@ -61,7 +68,8 @@ func sendHtmlEmail(templateFileName string, data any, to string, subject string)
 
 	// create email
 	email := mail.NewMSG()
-	email.SetFrom(config.Mail.User).AddTo(to).SetSubject(subject)
+	from := fmt.Sprintf("%s <%s>", config.Mail.UserName, config.Mail.UserAddress)
+	email.SetFrom(from).AddTo(to).SetSubject(subject)
 	email.SetBody(mail.TextHTML, body)
 
 	// send email

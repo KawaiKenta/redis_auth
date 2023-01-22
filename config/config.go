@@ -41,7 +41,8 @@ type redis struct {
 type mail struct {
 	Host              string
 	Port              int
-	User              string
+	UserAddress       string
+	UserName          string
 	Password          string
 	ConnectionTimeout time.Duration
 	SendTimeout       time.Duration

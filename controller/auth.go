@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"kk-rschian.com/redis_auth/service/database"
+	"kk-rschian.com/redis_auth/service/mail"
 	"kk-rschian.com/redis_auth/service/redis"
 	"kk-rschian.com/redis_auth/utils"
 )
@@ -17,41 +18,42 @@ func SignUp(c *gin.Context) {
 		Email    string `json:"email" binding:"required,email"`
 		Password string `json:"password" binding:"required,min=8"`
 	}
-	// TODO: return message
+	// veridation : エラーメッセージの改善
 	if err := c.ShouldBindJSON(&newUserInfo); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
 
-	// パスワードのハッシュ化
-	hashedPassword, err := utils.EncryptPassword(newUserInfo.Password)
+	// jsonデータに変換
+	serialize, err := json.Marshal(&newUserInfo)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
 
-	// 新規ユーザー作成
-	user := database.User{
-		Name:     newUserInfo.Name,
-		Email:    newUserInfo.Email,
-		Password: hashedPassword,
-	}
-
-	if err := database.CreateNewUser(&user); err != nil {
+	// uuidをkeyとして、redisに保存
+	uuid := utils.CreateToken()
+	if err := redis.SetUserInfo(c, uuid, string(serialize)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, user)
+
+	// 認証用メールの送信
+	if err := mail.SendEmailVerifyMail(c, newUserInfo.Email, uuid); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
+		return
+	}
+	c.Status(http.StatusNoContent)
 }
 
 // Email認証を行い、DBにユーザーを登録する
 // Emailからのアクセスなのでページを返してあげる
 func VerifyUser(c *gin.Context) {
 	// get access token from url
-	token := c.Query("uuid")
+	uuid := c.Query("uuid")
 
 	// check existance from redis
-	userJson, err := redis.GetSession(c, token)
+	userJson, err := redis.GetUserInfo(c, uuid)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 	}
@@ -61,14 +63,22 @@ func VerifyUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 	}
 
+	// パスワードのハッシュ化
+	hashedPassword, err := utils.EncryptPassword(user.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
+		return
+	}
+	user.Password = hashedPassword
+
 	// create user
 	if err := database.CreateNewUser(&user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
 
-	// TODO: jsonではなくページを返す必要があるのでは
-	c.JSON(http.StatusOK, user)
+	redis.DeleteUserInfo(c, uuid)
+	c.HTML(http.StatusOK, "verify.html", gin.H{"token": uuid})
 }
 
 // passwordリセットの要求
@@ -82,10 +92,4 @@ func RequestPassword(c *gin.Context) {
 // emailからなのでページを返してあげる
 func ResetPassword(c *gin.Context) {
 
-}
-
-func TestView(c *gin.Context) {
-	// get access token from url
-	token := c.Query("uuid")
-	c.HTML(http.StatusOK, "verify.html", gin.H{"token": token})
 }
