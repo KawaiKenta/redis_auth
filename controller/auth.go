@@ -33,7 +33,8 @@ func SignUp(c *gin.Context) {
 
 	// uuidをkeyとして、redisに保存
 	uuid := utils.CreateToken()
-	if err := redis.SetUserInfo(c, uuid, string(serialize)); err != nil {
+	// exptime
+	if err := redis.SetSession(c, uuid, string(serialize)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
@@ -55,17 +56,22 @@ func VerifyUser(c *gin.Context) {
 	// check existance from redis
 	userJson, err := redis.GetUserInfo(c, uuid)
 	if err != nil {
+		// 認証情報がありません
 		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
 	}
 
 	var user database.User
 	if err := json.Unmarshal([]byte(userJson), &user); err != nil {
+		// ユーザーデータのパース中にエラー
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
+		return
 	}
 
 	// パスワードのハッシュ化
 	hashedPassword, err := utils.EncryptPassword(user.Password)
 	if err != nil {
+		// ハッシュ化に失敗
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
@@ -73,6 +79,7 @@ func VerifyUser(c *gin.Context) {
 
 	// create user
 	if err := database.CreateNewUser(&user); err != nil {
+		// データベースサーバーにエラー
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 func SetSession(c *gin.Context) {
-	if err := redis.SetSession(c, "hello", "world"); err != nil {
+	if err := redis.SetSession(c, "heler23lo", "worl234d"); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}

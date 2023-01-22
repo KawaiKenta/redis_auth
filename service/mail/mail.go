@@ -24,7 +24,7 @@ func SetUp() {
 	server.Username = config.Mail.UserAddress
 	server.Password = config.Mail.Password
 	server.Encryption = mail.EncryptionSTARTTLS
-	server.KeepAlive = false
+	server.KeepAlive = true
 	server.ConnectTimeout = config.Mail.ConnectionTimeout
 	server.SendTimeout = config.Mail.SendTimeout
 
