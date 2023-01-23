@@ -4,9 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// TODO: sessionのhttponlyとかは有効にしたほうがいい
-func SetSession(c *gin.Context, key string, value string) error {
-	if err := Client.Set(c, key, value, expTime).Err(); err != nil {
+func SetSession(c *gin.Context, sessionId string) error {
+	if err := Client.Set(c, "sessionId", sessionId, expTime).Err(); err != nil {
 		return err
 	}
 	return nil

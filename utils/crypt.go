@@ -16,7 +16,7 @@ func EncryptPassword(password string) (string, error) {
 	return string(hashedPassword), nil
 }
 
-// 長さlengthのランダム文字列を生成する
+// ユニークなtokenを取得する
 func CreateToken() string {
 	uuidWithHyphen := uuid.New()
 	uuid := strings.Replace(uuidWithHyphen.String(), "-", "", -1)

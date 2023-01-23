@@ -17,14 +17,6 @@ func InitRoute() *gin.Engine {
 	router.POST("/user/signup", controller.SignUp)
 	router.GET("/user/verify", controller.VerifyUser)
 
-	router.GET("/set1", controller.SetSession)
-	router.GET("/get", controller.GetSession)
-	router.GET("/del", controller.DeleteSession)
-
-	// signup: set userdata to db. set random id for verify.
-	//         then, send email.
-	// verify: verify email. use db
-	//          you have to retry signup
 	// サインアップ時にデータベースを使うかredisを使うか悩みどころ
 	// login: get login data and verify with database. After that,
 	//        set the session data, then return session data.

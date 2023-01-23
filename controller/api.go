@@ -52,29 +52,30 @@ func Login(c *gin.Context) {
 		Email    string `json:"email" binding:"required,email"`
 		Password string `json:"password" binding:"required,min=8"`
 	}
+
 	// veridation : エラーメッセージの改善
 	if err := c.ShouldBindJSON(&loginForm); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
-	// データベースからuserを取得
-	user, err := database.GetUserByEmail(loginForm.Email)
+
+	// データベースにuserが存在するかチェック
+	_, err := database.GetUserByEmail(loginForm.Email)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
-	// セッション情報の作成
-	serialize, err := json.Marshal(&user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
-		return
-	}
-	uuid := utils.CreateToken()
+
 	// セッションサーバーへ送る
-	if err := redis.SetSession(c, uuid, string(serialize)); err != nil {
+	sessionId := utils.CreateToken()
+	if err := redis.SetSession(c, sessionId); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
+
+	// cookieのセット
+	c.SetCookie("sessionId", sessionId, 0, "/", "localhost", false, false)
+	c.Status(http.StatusNoContent)
 }
 
 // passwordリセットの要求
@@ -89,3 +90,11 @@ func RequestPassword(c *gin.Context) {
 func ResetPassword(c *gin.Context) {
 
 }
+
+// 	_, err := c.Cookie(key)
+// c.SetCookie(key, "", -1, "/", "localhost", secure, httpOnly)
+
+// 	_, err := c.Cookie(key)
+// if err != nil {
+// 	return "", err
+// }
