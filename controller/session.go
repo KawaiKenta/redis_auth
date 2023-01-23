@@ -37,3 +37,11 @@ func DeleteSession(c *gin.Context) {
 		"delete": "ok",
 	})
 }
+
+// 	_, err := c.Cookie(key)
+// c.SetCookie(key, "", -1, "/", "localhost", secure, httpOnly)
+// c.SetCookie(key, value, 0, "/", "localhost", secure, httpOnly)
+// 	_, err := c.Cookie(key)
+// if err != nil {
+// 	return "", err
+// }

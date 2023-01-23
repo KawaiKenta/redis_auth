@@ -33,8 +33,7 @@ func SignUp(c *gin.Context) {
 
 	// uuidをkeyとして、redisに保存
 	uuid := utils.CreateToken()
-	// exptime
-	if err := redis.SetSession(c, uuid, string(serialize)); err != nil {
+	if err := redis.SetUserInfo(c, uuid, string(serialize)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
@@ -47,45 +46,35 @@ func SignUp(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// Email認証を行い、DBにユーザーを登録する
-// Emailからのアクセスなのでページを返してあげる
-func VerifyUser(c *gin.Context) {
-	// get access token from url
-	uuid := c.Query("uuid")
-
-	// check existance from redis
-	userJson, err := redis.GetUserInfo(c, uuid)
-	if err != nil {
-		// 認証情報がありません
+func Login(c *gin.Context) {
+	// ユーザー登録情報
+	var loginForm struct {
+		Email    string `json:"email" binding:"required,email"`
+		Password string `json:"password" binding:"required,min=8"`
+	}
+	// veridation : エラーメッセージの改善
+	if err := c.ShouldBindJSON(&loginForm); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
-
-	var user database.User
-	if err := json.Unmarshal([]byte(userJson), &user); err != nil {
-		// ユーザーデータのパース中にエラー
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
-		return
-	}
-
-	// パスワードのハッシュ化
-	hashedPassword, err := utils.EncryptPassword(user.Password)
+	// データベースからuserを取得
+	user, err := database.GetUserByEmail(loginForm.Email)
 	if err != nil {
-		// ハッシュ化に失敗
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
+	}
+	// セッション情報の作成
+	serialize, err := json.Marshal(&user)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
-	user.Password = hashedPassword
-
-	// create user
-	if err := database.CreateNewUser(&user); err != nil {
-		// データベースサーバーにエラー
+	uuid := utils.CreateToken()
+	// セッションサーバーへ送る
+	if err := redis.SetSession(c, uuid, string(serialize)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
-
-	redis.DeleteUserInfo(c, uuid)
-	c.HTML(http.StatusOK, "verify.html", gin.H{"token": uuid})
 }
 
 // passwordリセットの要求

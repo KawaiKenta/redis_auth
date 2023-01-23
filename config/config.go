@@ -32,10 +32,11 @@ type database struct {
 }
 
 type redis struct {
-	Address        string
-	Password       string
-	DataBaseType   int
-	ExpirationTime time.Duration
+	Address               string
+	Password              string
+	DataBaseType          int
+	SessionExpirationTime time.Duration
+	UserExpirationTime    time.Duration
 }
 
 type mail struct {

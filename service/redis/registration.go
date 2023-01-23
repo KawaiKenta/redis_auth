@@ -10,6 +10,7 @@ func SetUserInfo(c *gin.Context, key string, json string) error {
 	if err := Client.Set(c, key, json, time.Minute*30).Err(); err != nil {
 		return err
 	}
+
 	return nil
 }
 
