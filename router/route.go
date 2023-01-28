@@ -13,14 +13,22 @@ func InitRoute() *gin.Engine {
 	router.Static("/assets", "views/assets")
 	router.LoadHTMLGlob("views/*html")
 
-	// 2回目だとエラーが帰る, redisのセッションが切れる？
 	router.POST("/user/signup", controller.SignUp)
 	router.GET("/user/verify", controller.VerifyUser)
+	router.POST("/user/login", controller.Login)
+	router.POST("/user/logout", controller.Logout)
 
-	// サインアップ時にデータベースを使うかredisを使うか悩みどころ
-	// login: get login data and verify with database. After that,
-	//        set the session data, then return session data.
-	// logout: delete session data
+	// password reset
+	// 1. send reset mail
+	// get email
+	// create uuid
+	// set session
+	// send email
+
+	// 2. show reset form
+	// get new password
+	//
+
 	// update: update userdata (need session)
 	return router
 }

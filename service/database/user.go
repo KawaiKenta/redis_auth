@@ -20,7 +20,7 @@ type User struct {
 func GetUserByEmail(email string) (*User, error) {
 	var user *User
 	if err := DB.Where("email=?", email).First(&user).Error; err != nil {
-		return user, err
+		return nil, err
 	}
 	return user, nil
 }
@@ -35,7 +35,7 @@ func CreateNewUser(user *User) error {
 func GetUserById(id int) (*User, error) {
 	var user *User
 	if err := DB.Where("ID=?", id).First(&user).Error; err != nil {
-		return user, err
+		return nil, err
 	}
 	return user, nil
 }

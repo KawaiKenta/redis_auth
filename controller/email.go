@@ -20,14 +20,14 @@ func VerifyUser(c *gin.Context) {
 	userJson, err := redis.GetUserInfo(c, uuid)
 	if err != nil {
 		// 認証情報がありません
-		c.HTML(http.StatusOK, "verify_failed.html", gin.H{"token": uuid})
+		c.HTML(http.StatusBadRequest, "verify_failed_expire.html", gin.H{"token": uuid})
 		return
 	}
 
 	var user database.User
 	if err := json.Unmarshal([]byte(userJson), &user); err != nil {
 		// ユーザーデータのパース中にエラー
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
+		c.HTML(http.StatusInternalServerError, "verify_failed_internal.html", gin.H{"token": uuid})
 		return
 	}
 
@@ -35,7 +35,7 @@ func VerifyUser(c *gin.Context) {
 	hashedPassword, err := utils.EncryptPassword(user.Password)
 	if err != nil {
 		// ハッシュ化に失敗
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
+		c.HTML(http.StatusInternalServerError, "verify_failed_internal.html", gin.H{"token": uuid})
 		return
 	}
 	user.Password = hashedPassword
@@ -43,10 +43,16 @@ func VerifyUser(c *gin.Context) {
 	// create user
 	if err := database.CreateNewUser(&user); err != nil {
 		// データベースサーバーにエラー
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
+		c.HTML(http.StatusBadRequest, "verify_failed_deplicate.html", gin.H{"token": uuid})
 		return
 	}
 
 	redis.DeleteUserInfo(c, uuid)
 	c.HTML(http.StatusOK, "verify_success.html", gin.H{"token": uuid})
+}
+
+// passwordリセットを行う
+// emailからなのでページを返してあげる
+func ResetPassword(c *gin.Context) {
+
 }

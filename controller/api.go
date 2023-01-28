@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 	"kk-rschian.com/redis_auth/service/database"
 	"kk-rschian.com/redis_auth/service/mail"
 	"kk-rschian.com/redis_auth/service/redis"
@@ -21,6 +22,13 @@ func SignUp(c *gin.Context) {
 	// veridation : エラーメッセージの改善
 	if err := c.ShouldBindJSON(&newUserInfo); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
+	}
+
+	// emailが使用されているか
+	user, _ := database.GetUserByEmail(newUserInfo.Email)
+	if user != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "すでに使用されているメールアドレスです"})
 		return
 	}
 
@@ -53,16 +61,21 @@ func Login(c *gin.Context) {
 		Password string `json:"password" binding:"required,min=8"`
 	}
 
-	// veridation : エラーメッセージの改善
 	if err := c.ShouldBindJSON(&loginForm); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
 
 	// データベースにuserが存在するかチェック
-	_, err := database.GetUserByEmail(loginForm.Email)
+	user, err := database.GetUserByEmail(loginForm.Email)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "使用されていないメールアドレスです"})
+		return
+	}
+
+	// パスワードを検証
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginForm.Password)); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "パスワードが間違っています"})
 		return
 	}
 
@@ -78,23 +91,28 @@ func Login(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+func Logout(c *gin.Context) {
+	// cookieの取得
+	sessionId, err := c.Cookie("sessionId")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
+	}
+
+	// セッションサーバーから消去
+	if err := redis.DeleteSession(c, sessionId); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
+	}
+
+	// cookieのオーバーライト
+	c.SetCookie("sessionId", "", -1, "/", "localhost", false, false)
+	c.Status(http.StatusNoContent)
+}
+
 // passwordリセットの要求
 func RequestPassword(c *gin.Context) {
 	// リセット用uuidを作成
 	// emailとともにreidsにセット
 	// 贈りました
 }
-
-// passwordリセットを行う
-// emailからなのでページを返してあげる
-func ResetPassword(c *gin.Context) {
-
-}
-
-// 	_, err := c.Cookie(key)
-// c.SetCookie(key, "", -1, "/", "localhost", secure, httpOnly)
-
-// 	_, err := c.Cookie(key)
-// if err != nil {
-// 	return "", err
-// }
