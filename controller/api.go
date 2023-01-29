@@ -110,9 +110,34 @@ func Logout(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// passwordリセットの要求
-func RequestPassword(c *gin.Context) {
-	// リセット用uuidを作成
-	// emailとともにreidsにセット
-	// 贈りました
+func RequestResetPassword(c *gin.Context) {
+	// ユーザー登録情報
+	var requestForm struct {
+		Email string `json:"email" binding:"required,email"`
+	}
+	if err := c.ShouldBindJSON(&requestForm); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
+	}
+
+	// データベースにuserが存在するかチェック
+	user, err := database.GetUserByEmail(requestForm.Email)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "使用されていないメールアドレスです"})
+		return
+	}
+
+	// uuidをkeyとして、redisに保存
+	uuid := utils.CreateToken()
+	if err := redis.SetResetPassword(c, uuid, user); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
+		return
+	}
+
+	// 認証用メールの送信
+	if err := mail.SendResetPasswordMail(c, requestForm.Email, uuid); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
+		return
+	}
+	c.Status(http.StatusNoContent)
 }

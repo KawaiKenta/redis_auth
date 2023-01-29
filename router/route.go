@@ -14,21 +14,11 @@ func InitRoute() *gin.Engine {
 	router.LoadHTMLGlob("views/*html")
 
 	router.POST("/user/signup", controller.SignUp)
-	router.GET("/user/verify", controller.VerifyUser)
+	router.GET("/user/verify/:uuid", controller.VerifyUser)
 	router.POST("/user/login", controller.Login)
 	router.POST("/user/logout", controller.Logout)
-
-	// password reset
-	// 1. send reset mail
-	// get email
-	// create uuid
-	// set session
-	// send email
-
-	// 2. show reset form
-	// get new password
-	//
-
+	router.POST("/user/request-password-reset", controller.RequestResetPassword)
+	router.GET("/user/reset-password-form/:uuid", controller.ResetPasswordForm)
 	// update: update userdata (need session)
 	return router
 }

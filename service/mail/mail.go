@@ -50,9 +50,20 @@ func SendEmailVerifyMail(c *gin.Context, to string, token string) error {
 	return nil
 }
 
-// func SendResetPasswordMail(to string, token string) error {
+func SendResetPasswordMail(c *gin.Context, to string, token string) error {
+	templateFileName := "views/password_reset_mail.html"
+	url := fmt.Sprintf("%s%s?uuid=%s", c.Request.Host, "/user/reset", token)
+	data := struct {
+		Token string
+		Url   string
+	}{Token: token, Url: url}
 
-// }
+	subject := "パスワードをリセットしてください"
+	if err := sendHtmlEmail(templateFileName, data, to, subject); err != nil {
+		return err
+	}
+	return nil
+}
 
 func sendHtmlEmail(templateFileName string, data any, to string, subject string) error {
 	// get html from template

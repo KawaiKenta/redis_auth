@@ -51,8 +51,19 @@ func VerifyUser(c *gin.Context) {
 	c.HTML(http.StatusOK, "verify_success.html", gin.H{"token": uuid})
 }
 
-// passwordリセットを行う
-// emailからなのでページを返してあげる
-func ResetPassword(c *gin.Context) {
-
+// 2. show reset form
+// get new password
+// send it with uuid
+// check redis
+// overwrite
+// show page
+func ResetPasswordForm(c *gin.Context) {
+	// get access token from url
+	uuid := c.Query("uuid")
+	// userJson, err := redis.GetUserInfo(c, uuid)
+	// if err != nil {
+	// 	// 認証情報がありません
+	// 	c.HTML(http.StatusBadRequest, "verify_failed_expire.html", gin.H{"token": uuid})
+	// 	return
+	// }
 }
