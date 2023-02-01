@@ -7,6 +7,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 	"kk-rschian.com/redis_auth/config"
+	"kk-rschian.com/redis_auth/models"
 	"kk-rschian.com/redis_auth/service/database"
 )
 
@@ -29,14 +30,14 @@ func main() {
 	switch flag {
 	case "table:up":
 		if err := database.DB.AutoMigrate(
-			&database.User{},
+			&models.User{},
 		); err != nil {
 			panic(err)
 		}
 		fmt.Printf("Tables are created in %s\n", config.Database.Name)
 	case "table:down":
 		if err := database.DB.Migrator().DropTable(
-			&database.User{},
+			&models.User{},
 		); err != nil {
 			panic(err)
 		}
@@ -59,7 +60,7 @@ func main() {
 func userSeeds() error {
 	for i := 0; i < 10; i++ {
 		hash, _ := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
-		user := database.User{
+		user := models.User{
 			Name:     "user" + strconv.Itoa(i+1),
 			Email:    "sample" + strconv.Itoa(i+1) + "@gmail.com",
 			Password: string(hash),

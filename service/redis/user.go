@@ -5,38 +5,35 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"kk-rschian.com/redis_auth/service/database"
+	"kk-rschian.com/redis_auth/models"
 )
 
-func SetUserInfo(c *gin.Context, key string, json string) error {
-	if err := Client.Set(c, key, json, time.Minute*30).Err(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func GetUserInfo(c *gin.Context, key string) (string, error) {
-	val, err := Client.Get(c, key).Result()
-	if err != nil {
-		return "", err
-	}
-	return val, nil
-}
-
-func DeleteUserInfo(c *gin.Context, key string) error {
-	if err := Client.Del(c, key).Err(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func SetResetPassword(c *gin.Context, key string, user *database.User) error {
+func SetUser(c *gin.Context, key string, user *models.User) error {
 	serialize, err := json.Marshal(user)
 	if err != nil {
 		return err
 	}
 	if err := Client.Set(c, key, serialize, time.Minute*30).Err(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetUser(c *gin.Context, key string) (*models.User, error) {
+	var user *models.User
+	serialize, err := Client.Get(c, key).Result()
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal([]byte(serialize), &user); err != nil {
+		// ユーザーデータのパース中にエラー
+		return nil, err
+	}
+	return user, nil
+}
+
+func DeleteUser(c *gin.Context, key string) error {
+	if err := Client.Del(c, key).Err(); err != nil {
 		return err
 	}
 	return nil

@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,23 +24,16 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	// emailが使用されているか
+	// すでにユーザーが存在している場合はエラー
 	user, _ := database.GetUserByEmail(newUserInfo.Email)
 	if user != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "すでに使用されているメールアドレスです"})
 		return
 	}
 
-	// jsonデータに変換
-	serialize, err := json.Marshal(&newUserInfo)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
-		return
-	}
-
-	// uuidをkeyとして、redisに保存
+	// userをredisに登録
 	uuid := utils.CreateToken()
-	if err := redis.SetUserInfo(c, uuid, string(serialize)); err != nil {
+	if err := redis.SetUser(c, uuid, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
@@ -81,7 +73,7 @@ func Login(c *gin.Context) {
 
 	// セッションサーバーへ送る
 	sessionId := utils.CreateToken()
-	if err := redis.SetSession(c, sessionId); err != nil {
+	if err := redis.SetUser(c, sessionId, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
@@ -100,7 +92,7 @@ func Logout(c *gin.Context) {
 	}
 
 	// セッションサーバーから消去
-	if err := redis.DeleteSession(c, sessionId); err != nil {
+	if err := redis.DeleteUser(c, sessionId); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
@@ -129,7 +121,7 @@ func RequestResetPassword(c *gin.Context) {
 
 	// uuidをkeyとして、redisに保存
 	uuid := utils.CreateToken()
-	if err := redis.SetResetPassword(c, uuid, user); err != nil {
+	if err := redis.SetUser(c, uuid, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}

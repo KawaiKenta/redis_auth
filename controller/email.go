@@ -1,13 +1,11 @@
 package controller
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"kk-rschian.com/redis_auth/service/database"
 	"kk-rschian.com/redis_auth/service/redis"
-	"kk-rschian.com/redis_auth/utils"
 )
 
 // Email認証を行い、DBにユーザーを登録する
@@ -17,37 +15,27 @@ func VerifyUser(c *gin.Context) {
 	uuid := c.Query("uuid")
 
 	// check existance from redis
-	userJson, err := redis.GetUserInfo(c, uuid)
+	user, err := redis.GetUser(c, uuid)
 	if err != nil {
 		// 認証情報がありません
 		c.HTML(http.StatusBadRequest, "verify_failed_expire.html", gin.H{"token": uuid})
 		return
 	}
 
-	var user database.User
-	if err := json.Unmarshal([]byte(userJson), &user); err != nil {
-		// ユーザーデータのパース中にエラー
-		c.HTML(http.StatusInternalServerError, "verify_failed_internal.html", gin.H{"token": uuid})
-		return
-	}
-
 	// パスワードのハッシュ化
-	hashedPassword, err := utils.EncryptPassword(user.Password)
-	if err != nil {
-		// ハッシュ化に失敗
-		c.HTML(http.StatusInternalServerError, "verify_failed_internal.html", gin.H{"token": uuid})
+	if err := user.HashPassword(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
-	user.Password = hashedPassword
 
 	// create user
-	if err := database.CreateNewUser(&user); err != nil {
+	if err := database.CreateUser(user); err != nil {
 		// データベースサーバーにエラー
 		c.HTML(http.StatusBadRequest, "verify_failed_deplicate.html", gin.H{"token": uuid})
 		return
 	}
 
-	redis.DeleteUserInfo(c, uuid)
+	redis.DeleteUser(c, uuid)
 	c.HTML(http.StatusOK, "verify_success.html", gin.H{"token": uuid})
 }
 
@@ -60,6 +48,16 @@ func VerifyUser(c *gin.Context) {
 func ResetPasswordForm(c *gin.Context) {
 	// get access token from url
 	uuid := c.Query("uuid")
+
+	_, err := redis.GetUser(c, uuid)
+	if err != nil {
+		// 認証情報がありません
+		c.HTML(http.StatusBadRequest, "verify_failed_expire.html", gin.H{"token": uuid})
+		return
+	}
+
+	c.HTML(http.StatusOK, "verify_success.html", gin.H{"token": uuid})
+
 	// userJson, err := redis.GetUserInfo(c, uuid)
 	// if err != nil {
 	// 	// 認証情報がありません
