@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"kk-rschian.com/redis_auth/const/routes"
 	"kk-rschian.com/redis_auth/controller"
 )
 
@@ -13,12 +14,12 @@ func InitRoute() *gin.Engine {
 	router.Static("/assets", "views/assets")
 	router.LoadHTMLGlob("views/*html")
 
-	router.POST("/user/signup", controller.SignUp)
-	router.GET("/user/verify/:uuid", controller.VerifyUser)
-	router.POST("/user/login", controller.Login)
-	router.POST("/user/logout", controller.Logout)
-	router.POST("/user/request-password-reset", controller.RequestResetPassword)
-	router.GET("/user/reset-password-form/:uuid", controller.ResetPasswordForm)
+	router.POST(routes.SignUp, controller.SignUp)
+	router.GET(routes.VerifyEmail, controller.VerifyUser)
+	router.POST(routes.Login, controller.Login)
+	router.POST(routes.Logout, controller.Logout)
+	router.POST(routes.RequestPasswordReset, controller.RequestResetPassword)
+	router.GET(routes.PasswordResetForm, controller.ResetPasswordForm)
 	// update: update userdata (need session)
 	return router
 }

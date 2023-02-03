@@ -3,7 +3,7 @@ package database
 import (
 	"errors"
 
-	"kk-rschian.com/redis_auth/models"
+	"kk-rschian.com/redis_auth/const/models"
 )
 
 func GetUserByEmail(email string) (*models.User, error) {

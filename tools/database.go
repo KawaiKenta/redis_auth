@@ -7,7 +7,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 	"kk-rschian.com/redis_auth/config"
-	"kk-rschian.com/redis_auth/models"
+	"kk-rschian.com/redis_auth/const/models"
 	"kk-rschian.com/redis_auth/service/database"
 )
 

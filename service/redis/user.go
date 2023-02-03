@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"kk-rschian.com/redis_auth/models"
+	"kk-rschian.com/redis_auth/const/models"
 )
 
 func SetUser(c *gin.Context, key string, user *models.User) error {
