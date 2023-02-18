@@ -53,7 +53,6 @@ func DeleteUser(id int) error {
 
 func UpdateUser(user *User) error {
 	result := DB.Model(&user).Updates(map[string]interface{}{
-		"name":     user.Name,
 		"password": user.Password,
 	})
 	if result.Error != nil {

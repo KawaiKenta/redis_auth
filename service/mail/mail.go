@@ -35,7 +35,7 @@ func SetUp() {
 }
 
 func SendEmailVerifyMail(c *gin.Context, to string, token string) error {
-	templateFileName := "views/verify_email.html"
+	templateFileName := "service/mail/verify_email.html"
 	// TODO: ハードコーディング
 	url := fmt.Sprintf("%s%s?uuid=%s", c.Request.Host, "/user/verify", token)
 	data := struct {
@@ -51,7 +51,7 @@ func SendEmailVerifyMail(c *gin.Context, to string, token string) error {
 }
 
 func SendResetPasswordMail(c *gin.Context, to string, token string) error {
-	templateFileName := "views/password_reset_mail.html"
+	templateFileName := "service/mail/password_reset_mail.html"
 	url := fmt.Sprintf("%s%s?uuid=%s", c.Request.Host, "/user/reset", token)
 	data := struct {
 		Token string

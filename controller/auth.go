@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +11,7 @@ import (
 	"kk-rschian.com/redis_auth/utils"
 )
 
-func SignUp(c *gin.Context) {
+func Signup(c *gin.Context) {
 	// ユーザー登録情報
 	var newUserInfo struct {
 		Name     string `json:"name" binding:"required"`
@@ -32,16 +31,9 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	// jsonデータに変換
-	serialize, err := json.Marshal(&newUserInfo)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
-		return
-	}
-
 	// uuidをkeyとして、redisに保存
 	uuid := utils.CreateToken()
-	if err := redis.SetUserInfo(c, uuid, string(serialize)); err != nil {
+	if err := redis.SetUserInfo(c, uuid, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
@@ -51,6 +43,38 @@ func SignUp(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
+	c.Status(http.StatusNoContent)
+}
+
+func VerifyEmail(c *gin.Context) {
+	// get access token from url
+	uuid := c.Query("uuid")
+
+	// check existance from redis
+	user, err := redis.GetUserInfo(c, uuid)
+	if err != nil {
+		// 認証情報がありません
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "無効なtokenです"})
+		return
+	}
+
+	// パスワードのハッシュ化
+	hashedPassword, err := utils.EncryptPassword(user.Password)
+	if err != nil {
+		// ハッシュ化に失敗
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": "パスワードのハッシュ化に失敗しました"})
+		return
+	}
+	user.Password = hashedPassword
+
+	// create user
+	if err := database.CreateNewUser(user); err != nil {
+		// データベースサーバーにエラー
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": "データベースエラー"})
+		return
+	}
+
+	redis.DeleteUserInfo(c, uuid)
 	c.Status(http.StatusNoContent)
 }
 
@@ -129,7 +153,7 @@ func RequestResetPassword(c *gin.Context) {
 
 	// uuidをkeyとして、redisに保存
 	uuid := utils.CreateToken()
-	if err := redis.SetResetPassword(c, uuid, user); err != nil {
+	if err := redis.SetUserInfo(c, uuid, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
@@ -139,5 +163,50 @@ func RequestResetPassword(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
+	c.Status(http.StatusNoContent)
+}
+
+func ResetPassword(c *gin.Context) {
+	// get access token from url
+	uuid := c.Query("uuid")
+	var ResetPasswordForm struct {
+		Password        string `json:"password" binding:"required,min=8"`
+		PasswordConfirm string `json:"passwordConfirm" binding:"required,min=8"`
+	}
+
+	// フォームの内容確認
+	if err := c.ShouldBindJSON(&ResetPasswordForm); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
+	}
+	// パスワードが確認用パスワードと一致しているか
+	if ResetPasswordForm.Password != ResetPasswordForm.PasswordConfirm {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "パスワードが異なっています"})
+		return
+	}
+
+	// ユーザー情報の取得
+	user, err := redis.GetUserInfo(c, uuid)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "無効なtokenです"})
+		return
+	}
+
+	// パスワードのハッシュ化
+	hashedPassword, err := utils.EncryptPassword(ResetPasswordForm.Password)
+	if err != nil {
+		// ハッシュ化に失敗
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": "パスワードのハッシュ化に失敗しました"})
+		return
+	}
+	user.Password = hashedPassword
+
+	// パスワードの更新
+	if err := database.UpdateUser(user); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": "データベースエラー"})
+		return
+	}
+
+	redis.DeleteUserInfo(c, uuid)
 	c.Status(http.StatusNoContent)
 }

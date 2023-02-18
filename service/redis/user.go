@@ -8,20 +8,19 @@ import (
 	"kk-rschian.com/redis_auth/service/database"
 )
 
-func SetUserInfo(c *gin.Context, key string, json string) error {
-	if err := Client.Set(c, key, json, time.Minute*30).Err(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func GetUserInfo(c *gin.Context, key string) (string, error) {
-	val, err := Client.Get(c, key).Result()
+func GetUserInfo(c *gin.Context, key string) (*database.User, error) {
+	// redis からの取得
+	userJson, err := Client.Get(c, key).Result()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return val, nil
+
+	// userへのパース
+	var user *database.User
+	if err := json.Unmarshal([]byte(userJson), &user); err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func DeleteUserInfo(c *gin.Context, key string) error {
@@ -31,7 +30,7 @@ func DeleteUserInfo(c *gin.Context, key string) error {
 	return nil
 }
 
-func SetResetPassword(c *gin.Context, key string, user *database.User) error {
+func SetUserInfo(c *gin.Context, key string, user *database.User) error {
 	serialize, err := json.Marshal(user)
 	if err != nil {
 		return err
