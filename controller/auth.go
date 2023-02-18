@@ -9,23 +9,23 @@ import (
 	"kk-rschian.com/redis_auth/service/mail"
 	"kk-rschian.com/redis_auth/service/redis"
 	"kk-rschian.com/redis_auth/utils"
+	"kk-rschian.com/redis_auth/validation"
 )
 
 func Signup(c *gin.Context) {
 	// ユーザー登録情報
-	var newUserInfo struct {
-		Name     string `json:"name" binding:"required"`
-		Email    string `json:"email" binding:"required,email"`
-		Password string `json:"password" binding:"required,min=8"`
+	var userRegister validation.UserRegister
+	if err := c.ShouldBindJSON(&userRegister); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
 	}
-	// veridation : エラーメッセージの改善
-	if err := c.ShouldBindJSON(&newUserInfo); err != nil {
+	if err := userRegister.Validation(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
 
 	// すでにユーザーが存在している場合はエラー
-	user, _ := database.GetUserByEmail(newUserInfo.Email)
+	user, _ := database.GetUserByEmail(userRegister.Email)
 	if user != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "すでに使用されているメールアドレスです"})
 		return
@@ -39,7 +39,7 @@ func Signup(c *gin.Context) {
 	}
 
 	// 認証用メールの送信
-	if err := mail.SendEmailVerifyMail(c, newUserInfo.Email, uuid); err != nil {
+	if err := mail.SendEmailVerifyMail(c, userRegister.Email, uuid); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}

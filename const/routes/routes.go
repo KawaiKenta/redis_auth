@@ -2,11 +2,10 @@ package routes
 
 // API
 const SignUp = "/signup"
+const VerifyEmail = "/verifyemail"
 const Login = "/login"
 const Logout = "/logout"
-const RequestPasswordReset = "/reset/request"
+const ForgetPassword = "/forgetpassword"
+const ResetPassword = "/resetpassword"
 
 // views
-const VerifyEmail = "/verify/:uuid"
-const PasswordResetForm = "/reset/form/:uuid"
-const VerifyPasswordReset = "/reset/verify"
