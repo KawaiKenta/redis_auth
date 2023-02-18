@@ -24,7 +24,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	// emailが使用されているか
+	// すでにユーザーが存在している場合はエラー
 	user, _ := database.GetUserByEmail(newUserInfo.Email)
 	if user != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "すでに使用されているメールアドレスです"})
@@ -59,16 +59,14 @@ func VerifyEmail(c *gin.Context) {
 	}
 
 	// パスワードのハッシュ化
-	hashedPassword, err := utils.EncryptPassword(user.Password)
-	if err != nil {
+	if err != user.HashPassword() {
 		// ハッシュ化に失敗
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": "パスワードのハッシュ化に失敗しました"})
 		return
 	}
-	user.Password = hashedPassword
 
 	// create user
-	if err := database.CreateNewUser(user); err != nil {
+	if err := database.CreateUser(user); err != nil {
 		// データベースサーバーにエラー
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": "データベースエラー"})
 		return
@@ -105,7 +103,7 @@ func Login(c *gin.Context) {
 
 	// セッションサーバーへ送る
 	sessionId := utils.CreateToken()
-	if err := redis.SetSession(c, sessionId); err != nil {
+	if err := redis.SetUserInfo(c, sessionId, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
@@ -124,7 +122,7 @@ func Logout(c *gin.Context) {
 	}
 
 	// セッションサーバーから消去
-	if err := redis.DeleteSession(c, sessionId); err != nil {
+	if err := redis.DeleteUser(c, sessionId); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 		return
 	}
@@ -193,13 +191,11 @@ func ResetPassword(c *gin.Context) {
 	}
 
 	// パスワードのハッシュ化
-	hashedPassword, err := utils.EncryptPassword(ResetPasswordForm.Password)
-	if err != nil {
+	if err != user.HashPassword() {
 		// ハッシュ化に失敗
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": "パスワードのハッシュ化に失敗しました"})
 		return
 	}
-	user.Password = hashedPassword
 
 	// パスワードの更新
 	if err := database.UpdateUser(user); err != nil {

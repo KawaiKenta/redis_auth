@@ -3,37 +3,26 @@ package database
 import (
 	"errors"
 
-	"gorm.io/gorm"
+	"kk-rschian.com/redis_auth/const/models"
 )
 
-/*
-IsVerified: Emailが認証されているか
-VerifyToken: Email認証, Password再設定時のアクセストークン
-*/
-type User struct {
-	gorm.Model
-	Name     string `gorm:"size:255" json:"name,omitempty"`
-	Email    string `gorm:"size:255;not null;unique" json:"email,omitempty"`
-	Password string `gorm:"size:255;not null" json:"password,omitempty"`
-}
-
-func GetUserByEmail(email string) (*User, error) {
-	var user *User
+func GetUserByEmail(email string) (*models.User, error) {
+	var user *models.User
 	if err := DB.Where("email=?", email).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func CreateNewUser(user *User) error {
+func CreateUser(user *models.User) error {
 	if err := DB.Create(&user).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func GetUserById(id int) (*User, error) {
-	var user *User
+func GetUserById(id int) (*models.User, error) {
+	var user *models.User
 	if err := DB.Where("ID=?", id).First(&user).Error; err != nil {
 		return nil, err
 	}
@@ -41,7 +30,7 @@ func GetUserById(id int) (*User, error) {
 }
 
 func DeleteUser(id int) error {
-	result := DB.Where("id=?", id).Delete(&User{})
+	result := DB.Where("id=?", id).Delete(&models.User{})
 	if result.Error != nil {
 		return result.Error
 	}
@@ -51,7 +40,7 @@ func DeleteUser(id int) error {
 	return nil
 }
 
-func UpdateUser(user *User) error {
+func UpdateUser(user *models.User) error {
 	result := DB.Model(&user).Updates(map[string]interface{}{
 		"password": user.Password,
 	})
