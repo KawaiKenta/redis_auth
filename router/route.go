@@ -7,8 +7,6 @@ import (
 	"kk-rschian.com/redis_auth/middleware"
 )
 
-// FIXME: ルートを外部の値にしておかないと、mail serviceがルートの値を使えない
-// 循環参照
 func InitRoute() *gin.Engine {
 	router := gin.Default()
 	user := router.Group("/user", middleware.AddCorsHeader)
