@@ -9,7 +9,7 @@ import (
 func AddCorsHeader(c *gin.Context) {
 	// TODO:Access-Control-Allow-Originを適切に指定する必要がある
 	// header 情報の付加
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 	c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, DELETE, OPTIONS")
 	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 	c.Writer.Header().Set("Access-Control-Max-Age", "86400")

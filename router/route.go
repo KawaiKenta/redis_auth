@@ -9,7 +9,8 @@ import (
 
 func InitRoute() *gin.Engine {
 	router := gin.Default()
-	user := router.Group("/user", middleware.AddCorsHeader)
+	router.Use(middleware.AddCorsHeader)
+	user := router.Group("/user")
 	{
 		user.POST(routes.SignUp, controller.Signup)
 		user.GET(routes.VerifyEmail, controller.VerifyEmail)

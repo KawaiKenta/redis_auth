@@ -40,7 +40,11 @@ func Signup(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-	c.Status(http.StatusNoContent)
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "ユーザー仮登録完了",
+	})
 }
 
 func VerifyEmail(c *gin.Context) {
@@ -69,7 +73,11 @@ func VerifyEmail(c *gin.Context) {
 	}
 
 	redis.DeleteUserInfo(c, uuid)
-	c.Status(http.StatusNoContent)
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "ユーザー本登録完了",
+	})
 }
 
 func Login(c *gin.Context) {
@@ -103,7 +111,10 @@ func Login(c *gin.Context) {
 
 	// cookieのセット
 	c.SetCookie("sessionId", sessionId, 0, "/", "localhost", false, false)
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "ログイン成功",
+	})
 }
 
 func Logout(c *gin.Context) {
@@ -122,7 +133,10 @@ func Logout(c *gin.Context) {
 
 	// cookieのオーバーライト
 	c.SetCookie("sessionId", "", -1, "/", "localhost", false, false)
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "ログアウト成功",
+	})
 }
 
 func RequestResetPassword(c *gin.Context) {
@@ -153,7 +167,10 @@ func RequestResetPassword(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "パスワードリセット申請を受理しました",
+	})
 }
 
 func ResetPassword(c *gin.Context) {
@@ -188,5 +205,8 @@ func ResetPassword(c *gin.Context) {
 	}
 
 	redis.DeleteUserInfo(c, uuid)
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "パスワードを再設定しました",
+	})
 }
