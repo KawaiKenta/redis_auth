@@ -36,7 +36,7 @@ func Signup(c *gin.Context) {
 		Password: form.Password,
 	}
 	uuid := utils.CreateToken()
-	if err := redis.SetUserInfo(c, uuid, user); err != nil {
+	if err := redis.SetUser(c, uuid, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
@@ -58,7 +58,7 @@ func VerifyEmail(c *gin.Context) {
 	uuid := c.Query("uuid")
 
 	// check existance from redis
-	user, err := redis.GetUserInfo(c, uuid)
+	user, err := redis.GetUser(c, uuid)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "無効なtokenです"})
 		return
@@ -78,7 +78,7 @@ func VerifyEmail(c *gin.Context) {
 		return
 	}
 
-	redis.DeleteUserInfo(c, uuid)
+	redis.DeleteUser(c, uuid)
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
 		"message": "ユーザー本登録完了",
@@ -109,7 +109,7 @@ func Login(c *gin.Context) {
 
 	// セッションサーバーへ送る
 	sessionId := utils.CreateToken()
-	if err := redis.SetUserInfo(c, sessionId, user); err != nil {
+	if err := redis.SetUser(c, sessionId, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
@@ -162,7 +162,7 @@ func RequestResetPassword(c *gin.Context) {
 
 	// uuidをkeyとして、redisに保存
 	uuid := utils.CreateToken()
-	if err := redis.SetUserInfo(c, uuid, user); err != nil {
+	if err := redis.SetUser(c, uuid, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
@@ -191,7 +191,7 @@ func ResetPassword(c *gin.Context) {
 	}
 
 	// ユーザー情報の取得
-	user, err := redis.GetUserInfo(c, uuid)
+	user, err := redis.GetUser(c, uuid)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "無効なtokenです"})
 		return
@@ -209,9 +209,29 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
-	redis.DeleteUserInfo(c, uuid)
+	redis.DeleteUser(c, uuid)
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
 		"message": "パスワードを再設定しました",
+	})
+}
+
+func Info(c *gin.Context) {
+	// cookieの取得
+	sessionId, err := c.Cookie("sessionId")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	// セッションサーバーから消去
+	user, err := redis.GetUser(c, sessionId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"user":   user,
 	})
 }

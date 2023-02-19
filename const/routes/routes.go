@@ -7,5 +7,6 @@ const Login = "/login"
 const Logout = "/logout"
 const ForgetPassword = "/forgetpassword"
 const ResetPassword = "/resetpassword"
+const Info = "/info"
 
 // views
