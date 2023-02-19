@@ -14,7 +14,6 @@ func GetUserInfo(c *gin.Context, key string) (*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	// userへのパース
 	var user *models.User
 	if err := json.Unmarshal([]byte(userJson), &user); err != nil {

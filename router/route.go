@@ -15,9 +15,9 @@ func InitRoute() *gin.Engine {
 		user.POST(routes.SignUp, controller.Signup)
 		user.GET(routes.VerifyEmail, controller.VerifyEmail)
 		user.POST(routes.Login, controller.Login)
-		user.POST(routes.Logout, controller.Logout)
+		user.GET(routes.Logout, controller.Logout)
 		user.POST(routes.ForgetPassword, controller.RequestResetPassword)
-		user.POST(routes.ResetPassword, controller.ResetPassword)
+		user.PATCH(routes.ResetPassword, controller.ResetPassword)
 	}
 
 	return router

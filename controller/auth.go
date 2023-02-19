@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"kk-rschian.com/redis_auth/const/models"
 	"kk-rschian.com/redis_auth/const/validation"
 	"kk-rschian.com/redis_auth/service/database"
 	"kk-rschian.com/redis_auth/service/mail"
@@ -29,6 +30,11 @@ func Signup(c *gin.Context) {
 	}
 
 	// uuidをkeyとして、redisに保存
+	user = &models.User{
+		Name:     form.Name,
+		Email:    form.Email,
+		Password: form.Password,
+	}
 	uuid := utils.CreateToken()
 	if err := redis.SetUserInfo(c, uuid, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -73,7 +79,6 @@ func VerifyEmail(c *gin.Context) {
 	}
 
 	redis.DeleteUserInfo(c, uuid)
-
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
 		"message": "ユーザー本登録完了",
