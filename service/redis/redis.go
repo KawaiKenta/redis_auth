@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"context"
 	"log"
 	"time"
 
@@ -19,10 +20,14 @@ func Setup() {
 		Password: config.Redis.Password,
 		DB:       config.Redis.DataBaseType,
 	})
+	_, err := Client.Ping(context.Background()).Result()
+	if err != nil {
+		log.Fatalf("redis server error: %v", err)
+	}
 }
 
 func Close() {
 	if err := Client.Close(); err != nil {
-		log.Fatalf("close when redis client: %v", err)
+		log.Fatalf("redis server error: %v", err)
 	}
 }
