@@ -1,0 +1,35 @@
+[server]
+RunMode = debug
+HttpPort = 8080
+ReadTimeout = 60s
+WriteTimeout = 60s
+
+[database]
+Type = mysql
+Host = 127.0.0.1
+Port = 3306
+Name = redisauth
+User = root
+Password = password
+Charset = utf8mb4
+
+[redis]
+Address = localhost:6379
+Password = 
+DataBaseType = 0
+SessionExpirationTime = 720h # 30days
+TemporaryExpirationTime = 30m
+
+[mail]
+Host = 
+Port = 
+UserAddress = 
+UserName = 
+Password = 
+ConnectionTimeout = 
+SendTimeout = 
+
+[session]
+domain = localhost
+secure = false
+httpOnly = false
