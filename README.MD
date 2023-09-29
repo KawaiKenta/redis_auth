@@ -32,3 +32,9 @@ gin フレームワークを用いた、ベーシックな認証 API
 - [ ] ハードコーディングの除去
 - [ ] データベースから model を切り出す
 - [ ] validation 層の実装
+
+## 立ち上げ
+
+- config.ini のメールサーバーを設定すること
+- データベース、redis の立ち上げ `docker compose up`
+- web サーバーの起動 `go run .`

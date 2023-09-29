@@ -37,7 +37,7 @@ func SetUp() {
 func SendEmailVerifyMail(c *gin.Context, to string, token string) error {
 	templateFileName := "service/mail/verify_email.html"
 	// TODO: ハードコーディング
-	url := fmt.Sprintf("%s%s?uuid=%s", c.Request.Host, "/user/verify", token)
+	url := fmt.Sprintf("%s%s?uuid=%s", c.Request.Host, "/user/verifyemail", token)
 	data := struct {
 		Token string
 		Url   string

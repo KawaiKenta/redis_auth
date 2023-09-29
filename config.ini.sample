@@ -8,9 +8,9 @@ WriteTimeout = 60s
 Type = mysql
 Host = 127.0.0.1
 Port = 3306
-Name = redisauth
-User = root
-Password = password
+Name = docker_db
+User = docker_user
+Password = docker_pass
 Charset = utf8mb4
 
 [redis]
@@ -21,13 +21,13 @@ SessionExpirationTime = 720h # 30days
 TemporaryExpirationTime = 30m
 
 [mail]
-Host = 
-Port = 
-UserAddress = 
-UserName = 
-Password = 
-ConnectionTimeout = 
-SendTimeout = 
+Host = sv8682.xserver.jp
+Port = 587
+UserAddress = no-reply@iseyama.online
+UserName = 株式会社イシェヤマ
+Password = iseyama4336
+ConnectionTimeout = 10s
+SendTimeout = 10s
 
 [session]
 domain = localhost

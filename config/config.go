@@ -61,9 +61,13 @@ func Setup() {
 		"database": Database,
 		"mail":     Mail,
 	}
+
 	for key, settingStruct := range settings {
 		if err := config.Section(key).MapTo(settingStruct); err != nil {
 			log.Fatalf("setting error: %v", err)
 		}
 	}
+	log.Printf("settings: %+v", Server)
+	log.Printf("settings: %+v", Redis)
+	log.Printf("settings: %+v", Database)
 }

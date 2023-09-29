@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -56,7 +57,7 @@ func Signup(c *gin.Context) {
 func VerifyEmail(c *gin.Context) {
 	// get access token from url
 	uuid := c.Query("uuid")
-
+	log.Printf("uuid: %s", uuid)
 	// check existance from redis
 	user, err := redis.GetUser(c, uuid)
 	if err != nil {
@@ -178,6 +179,8 @@ func RequestResetPassword(c *gin.Context) {
 	})
 }
 
+// ResetPassword だけ単体でAPIサーバーとして実装するのは難しい
+// 外部のフロンエンドからのuuid+jsonリクエストを受け取って、パスワードを再設定する想定
 func ResetPassword(c *gin.Context) {
 	// get access token from url
 	uuid := c.Query("uuid")

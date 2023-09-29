@@ -2,6 +2,7 @@ package redis
 
 import (
 	"encoding/json"
+	"log"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -12,8 +13,10 @@ func GetUser(c *gin.Context, key string) (*models.User, error) {
 	// redis からの取得
 	userJson, err := Client.Get(c, key).Result()
 	if err != nil {
+		log.Printf("redis get error: %v", err)
 		return nil, err
 	}
+	log.Printf("userJson: %s", userJson)
 	// userへのパース
 	var user *models.User
 	if err := json.Unmarshal([]byte(userJson), &user); err != nil {
